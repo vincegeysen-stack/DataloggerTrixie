@@ -22,7 +22,7 @@ Dit project is ontworpen voor de Raspberry Pi (OS Trixie) om temperatuur en luch
 ### 1. Clone de repository
 Open de terminal op je Raspberry Pi en typ:
 ```bash
-git clone [https://github.com/jmo2300/DataloggerTrixie](https://github.com/jmo2300/DataloggerTrixie)
+git clone https://github.com/jmo2300/DataloggerTrixie
 cd DataloggerTrixie
 
 ```
