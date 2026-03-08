@@ -2,8 +2,8 @@
 
 Dit project is ontworpen voor de Raspberry Pi (OS Trixie) om temperatuur en luchtvochtigheid te loggen in een MariaDB database. Het bevat een geautomatiseerd installatiescript dat ook de migratie van oude data (vanaf Bookworm) ondersteunt.
 
-
-`
+### Mappenstructuur van dit project:
+```text
 .
 ├── install_datalogger.sh    # Het hoofdscript (in de root)
 ├── README.md                # De handleiding (in de root)
@@ -14,7 +14,7 @@ Dit project is ontworpen voor de Raspberry Pi (OS Trixie) om temperatuur en luch
 │   └── BewaarTempGrafiek.py
 └── web/                     # Map voor webbestanden
     └── index.php            # (En de eigen bestanden van leerlingen)
-`
+```
 
 
 ## Snelle Start
