@@ -69,6 +69,6 @@ plt.grid(True)
 plt.draw()
 
 # plt.show()
-mijnafbeelding = str(home) + "/WEEKvochtigheid.png"
+mijnafbeelding = str(home) + "/MAANDvochtigheid.png"
 print(mijnafbeelding)
 plt.savefig(mijnafbeelding , dpi=100)
