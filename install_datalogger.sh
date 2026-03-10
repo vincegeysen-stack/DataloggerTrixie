@@ -193,11 +193,43 @@ if stel_vraag "Stap 6: Cronjobs instellen in jouw persoonlijke crontab?"; then
     echo "# Elke 15 minuten de sensor uitlezen" >> temp_cron
     echo "0,15,30,45 * * * * ~/pythonscripts/dhtvenv/bin/python ~/pythonscripts/temperatuurlogger.py" >> temp_cron
     echo "" >> temp_cron
-    echo "# Elke 15 minuten de afbeelding verversen" >> temp_cron
-    echo "1,16,31,46 * * * * ~/pythonscripts/dhtvenv/bin/python ~/pythonscripts/BewaarTempGrafiek.py" >> temp_cron
+    echo "# Elke 15 minuten de sensor uitlezen" >> temp_cron
+    echo "1,16,31,46 * * * * ~/pythonscripts/dhtvenv/bin/python ~/pythonscripts/MatplotlibDagTemperatuur.py" >> temp_cron
     echo "" >> temp_cron
-    echo "# Elke 15 minuten de afbeelding kopiëren naar webroot" >> temp_cron
-    echo "2,17,32,47 * * * * sudo cp ~/Raspi25Temperatuur.png /var/www/html/afbeeldingen/Raspi25Temperatuur.png" >> temp_cron
+    echo "# Elke 15 minuten de sensor uitlezen" >> temp_cron
+    echo "1,16,31,46 * * * * ~/pythonscripts/dhtvenv/bin/python ~/pythonscripts/MatplotlibWeekTemperatuur.py" >> temp_cron
+    echo "" >> temp_cron
+    echo "# Elke 15 minuten de sensor uitlezen" >> temp_cron
+    echo "1,16,31,46 * * * * ~/pythonscripts/dhtvenv/bin/python ~/pythonscripts/MatplotlibMaandTemperatuur.pyy" >> temp_cron
+    echo "" >> temp_cron
+    echo "# Elke 15 minuten de sensor uitlezen" >> temp_cron
+    echo "1,16,31,46 * * * * ~/pythonscripts/dhtvenv/bin/python ~/pythonscripts/MatplotlibDagVochtigheid.py" >> temp_cron
+    echo "" >> temp_cron
+    echo "# Elke 15 minuten de sensor uitlezen" >> temp_cron
+    echo "1,16,31,46 * * * * ~/pythonscripts/dhtvenv/bin/python ~/pythonscripts/MatplotlibWeekVochtigheid.py" >> temp_cron
+    echo "" >> temp_cron
+    echo "# Elke 15 minuten de sensor uitlezen" >> temp_cron
+    echo "1,16,31,46 * * * * ~/pythonscripts/dhtvenv/bin/python ~/pythonscripts/MatplotlibMaandVochtigheid.py" >> temp_cron
+    echo "" >> temp_cron
+    echo "# Elke 15 minuten de sensor uitlezen" >> temp_cron
+    echo "2,17,32,47 * * * * sudo cp ~/DAGtemperatuur.png /var/www/html" >> temp_cron
+    echo "" >> temp_cron
+    echo "# Elke 15 minuten de sensor uitlezen" >> temp_cron
+    echo "2,17,32,47 * * * * sudo cp ~/WEEKtemperatuur.png /var/www/html" >> temp_cron
+    echo "" >> temp_cron
+    echo "# Elke 15 minuten de sensor uitlezen" >> temp_cron
+    echo "2,17,32,47 * * * * sudo cp ~/MAANDtemperatuur.png /var/www/html" >> temp_cron
+    echo "" >> temp_cron
+    echo "# Elke 15 minuten de sensor uitlezen" >> temp_cron
+    echo "2,17,32,47 * * * * sudo cp ~/DAGtemperatuur.png /var/www/html" >> temp_cron
+    echo "" >> temp_cron
+    echo "# Elke 15 minuten de sensor uitlezen" >> temp_cron
+    echo "2,17,32,47 * * * * sudo cp ~/WEEKtemperatuur.png /var/www/html" >> temp_cron
+    echo "" >> temp_cron
+    echo "# Elke 15 minuten de sensor uitlezen" >> temp_cron
+    echo "2,17,32,47 * * * * sudo cp ~/MAANDtemperatuur.png /var/www/html" >> temp_cron
+    
+    
 
     # 3. Het tijdelijke bestand inladen als de nieuwe crontab
     crontab temp_cron
