@@ -18,6 +18,11 @@ import matplotlib.pyplot as plt
 import mysql.connector
 import time
 import shutil
+from pathlib import Path
+
+home = Path.home()
+
+
 
 # Zoek datum vandaag
 vandaag=time.strftime("%d-%m-%Y, %H:%M")
@@ -66,4 +71,6 @@ plt.grid(True)
 plt.draw()
 
 # plt.show()
-plt.savefig('/home/pi16/Raspi16DAGtemperatuur.png', dpi=100)
+mijnafbeelding = str(home) + "/DAGtemperatuur.png"
+print(mijnafbeelding)
+plt.savefig(mijnafbeelding , dpi=100)
