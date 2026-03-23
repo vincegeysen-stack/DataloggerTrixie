@@ -153,8 +153,8 @@ th{background-color:var(--accent-color);color:#fff;}
 <h2>Dagoverzicht</h2>
 <p>Temperatuur en luchtvochtigheid van vandaag.</p>
 <div class="graph-container graph-grid">
-<a class="graph-link temp day" data-img="Raspi16DAGtemperatuur.png"><span>Temperatuur (dag)</span></a>
-<a class="graph-link humidity day" data-img="Raspi16DAGvochtigheid.png"><span>Luchtvochtigheid (dag)</span></a>
+<a class="graph-link temp day" data-img="DAGtemperatuur.png"><span>Temperatuur (dag)</span></a>
+<a class="graph-link humidity day" data-img="DAGvochtigheid.png"><span>Luchtvochtigheid (dag)</span></a>
 </div>
 </div>
 </div>
@@ -165,8 +165,8 @@ th{background-color:var(--accent-color);color:#fff;}
 <h2>Weekoverzicht</h2>
 <p>Gemiddelden en trends van de afgelopen week.</p>
 <div class="graph-container graph-grid">
-<a class="graph-link temp week" data-img="Raspi16WEEKtemperatuur.png"><span>Temperatuur (week)</span></a>
-<a class="graph-link humidity week" data-img="Raspi16WEEKvochtigheid.png"><span>Luchtvochtigheid (week)</span></a>
+<a class="graph-link temp week" data-img="WEEKtemperatuur.png"><span>Temperatuur (week)</span></a>
+<a class="graph-link humidity week" data-img="WEEKvochtigheid.png"><span>Luchtvochtigheid (week)</span></a>
 </div>
 </div>
 </div>
@@ -177,8 +177,8 @@ th{background-color:var(--accent-color);color:#fff;}
 <h2>Maandoverzicht</h2>
 <p>Langetermijnevolutie van temperatuur en luchtvochtigheid.</p>
 <div class="graph-container graph-grid">
-<a class="graph-link temp month" data-img="Raspi16MAANDtemperatuur.png"><span>Temperatuur (maand)</span></a>
-<a class="graph-link humidity month" data-img="Raspi16MAANDvochtigheid.png"><span>Luchtvochtigheid (maand)</span></a>
+<a class="graph-link temp month" data-img="MAANDtemperatuur.png"><span>Temperatuur (maand)</span></a>
+<a class="graph-link humidity month" data-img="MAANDvochtigheid.png"><span>Luchtvochtigheid (maand)</span></a>
 </div>
 </div>
 </div>
