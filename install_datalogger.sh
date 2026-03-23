@@ -228,6 +228,9 @@ if stel_vraag "Stap 6: Cronjobs instellen in jouw persoonlijke crontab?"; then
     echo "" >> temp_cron
     echo "# Elke 15 minuten de sensor uitlezen" >> temp_cron
     echo "2,17,32,47 * * * * sudo cp ~/MAANDtemperatuur.png /var/www/html" >> temp_cron
+    echo "" >> temp_cron
+    echo "# # Eigenaar en uitvoerrechten fixen" >> temp_cron
+    echo "#2,17,32,47 * * * * sudo chown www-data:www-data /var/www/html/*.png" >> temp_cron
     
     
 
