@@ -20,7 +20,7 @@ $connectdb = mysqli_connect($host, $user, $password, $database)
     or die("Cannot reach database");
 
 // SQL query om de laatste $hours uur aan data op te halen
-$sql = "SELECT * FROM temperaturedata WHERE dateandtime >= (NOW() - INTERVAL $hours HOUR) ORDER BY dateandtime ASC";
+$sql = "SELECT * FROM temperaturedata WHERE dateandtime >= (NOW() - INTERVAL $hours HOUR) ORDER BY dateandtime DESC";
 $temperatures = mysqli_query($connectdb, $sql);
 ?>
 <!DOCTYPE html>
@@ -97,12 +97,12 @@ th{background-color:var(--accent-color);color:#fff;}
 .section.active{display:block;}
 
 /* ===== BACKGROUND IMAGES DAG/WEEK/MAAND ===== */
-.graph-link.day.temp{background-image:url("Raspi16DAGtemperatuur.png");}
-.graph-link.day.humidity{background-image:url("Raspi16DAGvochtigheid.png");}
-.graph-link.week.temp{background-image:url("Raspi16WEEKtemperatuur.png");}
-.graph-link.week.humidity{background-image:url("Raspi16WEEKvochtigheid.png");}
-.graph-link.month.temp{background-image:url("Raspi16MAANDtemperatuur.png");}
-.graph-link.month.humidity{background-image:url("Raspi16MAANDvochtigheid.png");}
+.graph-link.day.temp{background-image:url("DAGtemperatuur.png");}
+.graph-link.day.humidity{background-image:url("DAGvochtigheid.png");}
+.graph-link.week.temp{background-image:url("WEEKtemperatuur.png");}
+.graph-link.week.humidity{background-image:url("WEEKvochtigheid.png");}
+.graph-link.month.temp{background-image:url("MAANDtemperatuur.png");}
+.graph-link.month.humidity{background-image:url("MAANDvochtigheid.png");}
 </style>
 </head>
 
