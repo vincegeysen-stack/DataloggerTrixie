@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Temperatuur en Luchtvochtigheid Grafiek</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            text-align: center; /* Centraal plaatsen van de inhoud */
+        }
+        /* Verhoog de breedte en hoogte van het canvas */
+        canvas {
+            width: 90%;    /* Zorgt voor een brede grafiek, bijna volledig scherm */
+            height: 500px; /* Stelt een goede hoogte in voor de grafiek */
+            max-width: 1200px; /* Limiteert de maximale breedte */
+            margin: 20px auto; /* Centreren van het canvas */
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>Temperatuur en Luchtvochtigheid</h1>
+    <canvas id="myChart"></canvas>
+
+    <script>
+        // Simulatie van het ophalen van data vanuit een backend
+        fetch('data.php')  // Endpoint die JSON data serveert vanuit MySQL
+            .then(response => response.json())
+            .then(data => {
+                const labels = data.map(item => item.dateandtime);  // Pas de 'timestamp' aan naar 'dateandtime'
+                const temperatures = data.map(item => item.temperature);
+                const humidity = data.map(item => item.humidity);
+
+                const ctx = document.getElementById('myChart').getContext('2d');
+                const myChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: 'Temperatuur (°C)',
+                                data: temperatures,
+                                borderColor: 'rgba(255, 99, 132, 1)',
+                                fill: false,
+                                yAxisID: 'y-temp'
+                            },
+                            {
+                                label: 'Luchtvochtigheid (%)',
+                                data: humidity,
+                                borderColor: 'rgba(54, 162, 235, 1)',
+                                fill: false,
+                                yAxisID: 'y-humidity'
+                            }
+                        ]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true  // Zorgt ervoor dat de y-as vanaf 0 begint
+                            },
+                            yAxes: [
+                                {
+                                    id: 'y-temp',
+                                    type: 'linear',
+                                    position: 'left',
+                                    title: {
+                                        display: true,
+                                        text: 'Temperatuur (°C)'
+                                    }
+                                },
+                                {
+                                    id: 'y-humidity',
+                                    type: 'linear',
+                                    position: 'right',
+                                    title: {
+                                        display: true,
+                                        text: 'Luchtvochtigheid (%)'
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error('Error fetching data:', error));
+    </script>
+</body>
+</html>
