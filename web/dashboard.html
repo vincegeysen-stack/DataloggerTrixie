@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Temperatuur & Luchtvochtigheid Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        .chart-container {
+            position: relative;
+            margin-bottom: 40px;
+            height: 400px;
+        }
+        .controls {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .controls button {
+            margin: 0 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+        .controls button:hover {
+            background-color: #45a049;
+        }
+        .controls button.active {
+            background-color: #2196F3;
+        }
+        .controls button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .info-box {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+        }
+        .info-item {
+            text-align: center;
+        }
+        .info-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        .info-value {
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .temp-value { color: #ff6384; }
+        .humidity-value { color: #36a2eb; }
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+        .error {
+            text-align: center;
+            padding: 20px;
+            color: #d32f2f;
+            background-color: #ffebee;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 id="hostname">Temperatuur & Luchtvochtigheid Dashboard</h1>
+        <div class="subtitle" id="datetime"></div>
+
+        <div class="controls">
+            <button onclick="loadData('dag')" class="active" id="btn-dag">Dag (24u)</button>
+            <button onclick="loadData('week')" id="btn-week">Week (7d)</button>
+            <button onclick="loadData('maand')" id="btn-maand">Maand (30d)</button>
+            <button onclick="loadData('alle')" id="btn-alle">Alle Data</button>
+        </div>
+
+        <div id="loading" class="loading" style="display: none;">Gegevens laden...</div>
+        <div id="error" class="error" style="display: none;"></div>
+
+        <div class="chart-container">
+            <canvas id="tempChart"></canvas>
+        </div>
+
+        <div class="chart-container">
+            <canvas id="humidityChart"></canvas>
+        </div>
+
+        <div class="info-box" id="infoBox" style="display: none;">
+            <div class="info-item">
+                <div class="info-label">Tijd</div>
+                <div class="info-value" id="infoTime">-</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Temperatuur</div>
+                <div class="info-value temp-value" id="infoTemp">-</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Luchtvochtigheid</div>
+                <div class="info-value humidity-value" id="infoHumidity">-</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuratie
+        const CONFIG = {
+            dag: { limit: 96, label: 'Dag' },
+            week: { limit: 672, label: 'Week' },
+            maand: { limit: 2880, label: 'Maand' },
+            alle: { limit: 999999, label: 'Alle Data' }  // Zeer hoog getal voor alle data
+        };
+
+        let tempChart = null;
+        let humidityChart = null;
+        let currentPeriod = 'dag';
+        let isLoading = false;
+
+        // Formatteer datum naar string
+        function formatDateTime(date, period) {
+            const options = period === 'dag'
+                ? { hour: '2-digit', minute: '2-digit' }
+                : { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' };
+            return date.toLocaleString('nl-BE', options);
+        }
+
+        // Haal data op van PHP backend
+        async function fetchData(limit) {
+            try {
+                const response = await fetch(`get_data.php?limit=${limit}`);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const data = await response.json();
+
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+
+                return data.map(row => ({
+                    dateandtime: new Date(row.dateandtime),
+                    temperature: parseFloat(row.temperature),
+                    humidity: parseFloat(row.humidity)
+                }));
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                throw error;
+            }
+        }
+
+        // Crosshair plugin voor Chart.js
+        const crosshairPlugin = {
+            id: 'crosshair',
+            afterDraw(chart) {
+                if (chart.tooltip?._active?.length) {
+                    const ctx = chart.ctx;
+                    const activePoint = chart.tooltip._active[0];
+                    const x = activePoint.element.x;
+                    const topY = chart.scales.y.top;
+                    const bottomY = chart.scales.y.bottom;
+
+                    // Verticale lijn
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.moveTo(x, topY);
+                    ctx.lineTo(x, bottomY);
+                    ctx.lineWidth = 1;
+                    ctx.strokeStyle = 'rgba(0, 0, 0, 0.5)';
+                    ctx.setLineDash([5, 5]);
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            }
+        };
+
+        let isSyncing = false;
+
+        async function loadData(period) {
+            if (isLoading) return;
+
+            currentPeriod = period;
+            isLoading = true;
+
+            // Disable alle buttons tijdens laden
+            document.querySelectorAll('.controls button').forEach(btn => {
+                btn.disabled = true;
+                btn.classList.remove('active');
+            });
+            document.getElementById(`btn-${period}`).classList.add('active');
+
+            // Toon loading indicator
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('error').style.display = 'none';
+            document.getElementById('infoBox').style.display = 'none';
+
+            try {
+                // Vernietig oude charts VOLLEDIG
+                if (tempChart) {
+                    tempChart.destroy();
+                    tempChart = null;
+                }
+                if (humidityChart) {
+                    humidityChart.destroy();
+                    humidityChart = null;
+                }
+
+                // Wacht even om zeker te zijn dat canvas vrijgegeven is
+                await new Promise(resolve => setTimeout(resolve, 100));
+
+                // Haal data op
+                const data = await fetchData(CONFIG[period].limit);
+
+                if (data.length === 0) {
+                    throw new Error('Geen data beschikbaar');
+                }
+
+                // Maak labels als strings
+                const labels = data.map(d => formatDateTime(d.dateandtime, period));
+                const temperatures = data.map(d => d.temperature);
+                const humidities = data.map(d => d.humidity);
+                const rawDates = data.map(d => d.dateandtime);
+
+                // Bereken min en max voor luchtvochtigheid met wat marge
+                const humidityMin = Math.min(...humidities);
+                const humidityMax = Math.max(...humidities);
+                const humidityRange = humidityMax - humidityMin;
+                const humidityMargin = humidityRange * 0.1; // 10% marge boven en onder
+                const humidityScaleMin = Math.max(0, Math.floor(humidityMin - humidityMargin));
+                const humidityScaleMax = Math.min(100, Math.ceil(humidityMax + humidityMargin));
+
+                // Update datum/tijd
+                const now = new Date();
+                document.getElementById('datetime').textContent = now.toLocaleString('nl-BE');
+
+                // Info update functie
+                const updateInfo = (index) => {
+                    if (index >= 0 && index < rawDates.length) {
+                        document.getElementById('infoBox').style.display = 'flex';
+                        document.getElementById('infoTime').textContent = rawDates[index].toLocaleString('nl-BE', {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        });
+                        document.getElementById('infoTemp').textContent = temperatures[index].toFixed(1) + ' °C';
+                        document.getElementById('infoHumidity').textContent = humidities[index].toFixed(1) + ' %';
+                    }
+                };
+
+                // Sync functie om oneindige loop te voorkomen
+                const syncTooltips = (sourceChart, targetChart, index) => {
+                    if (isSyncing) return;
+                    isSyncing = true;
+
+                    if (targetChart && index >= 0) {
+                        targetChart.tooltip.setActiveElements([{datasetIndex: 0, index: index}]);
+                        targetChart.update('none');
+                    }
+
+                    setTimeout(() => { isSyncing = false; }, 0);
+                };
+
+                // Bepaal hoeveel ticks we tonen
+                let maxTicksLimit = 12;
+                if (period === 'week') maxTicksLimit = 14;
+                if (period === 'maand') maxTicksLimit = 15;
+
+                // Temperatuur chart
+                const tempCtx = document.getElementById('tempChart').getContext('2d');
+                tempChart = new Chart(tempCtx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Temperatuur (°C)',
+                            data: temperatures,
+                            borderColor: 'rgb(255, 99, 132)',
+                            backgroundColor: 'rgba(255, 99, 132, 0.1)',
+                            tension: 0.3,
+                            fill: true,
+                            pointRadius: 0,
+                            pointHoverRadius: 5,
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: `Temperatuur - ${CONFIG[period].label}`,
+                                font: {
+                                    size: 16
+                                }
+                            },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false,
+                                callbacks: {
+                                    afterBody: function(context) {
+                                        if (context.length > 0 && !isSyncing) {
+                                            const index = context[0].dataIndex;
+                                            syncTooltips(tempChart, humidityChart, index);
+                                            updateInfo(index);
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                ticks: {
+                                    maxRotation: 45,
+                                    minRotation: 45,
+                                    maxTicksLimit: maxTicksLimit
+                                }
+                            },
+                            y: {
+                                beginAtZero: false,
+                                title: {
+                                    display: true,
+                                    text: '°C'
+                                }
+                            }
+                        },
+                        interaction: {
+                            mode: 'index',
+                            intersect: false
+                        }
+                    },
+                    plugins: [crosshairPlugin]
+                });
+
+                // Luchtvochtigheid chart
+                const humidityCtx = document.getElementById('humidityChart').getContext('2d');
+                humidityChart = new Chart(humidityCtx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Luchtvochtigheid (%)',
+                            data: humidities,
+                            borderColor: 'rgb(54, 162, 235)',
+                            backgroundColor: 'rgba(54, 162, 235, 0.1)',
+                            tension: 0.3,
+                            fill: true,
+                            pointRadius: 0,
+                            pointHoverRadius: 5,
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: `Luchtvochtigheid - ${CONFIG[period].label}`,
+                                font: {
+                                    size: 16
+                                }
+                            },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false,
+                                callbacks: {
+                                    afterBody: function(context) {
+                                        if (context.length > 0 && !isSyncing) {
+                                            const index = context[0].dataIndex;
+                                            syncTooltips(humidityChart, tempChart, index);
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                ticks: {
+                                    maxRotation: 45,
+                                    minRotation: 45,
+                                    maxTicksLimit: maxTicksLimit
+                                }
+                            },
+                            y: {
+                                min: humidityScaleMin,
+                                max: humidityScaleMax,
+                                title: {
+                                    display: true,
+                                    text: '%'
+                                }
+                            }
+                        },
+                        interaction: {
+                            mode: 'index',
+                            intersect: false
+                        }
+                    },
+                    plugins: [crosshairPlugin]
+                });
+
+                // Verberg loading indicator
+                document.getElementById('loading').style.display = 'none';
+
+            } catch (error) {
+                console.error('Complete error:', error);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error').style.display = 'block';
+                document.getElementById('error').textContent = 'Fout bij laden van gegevens: ' + error.message;
+            } finally {
+                // Enable alle buttons weer
+                isLoading = false;
+                document.querySelectorAll('.controls button').forEach(btn => {
+                    btn.disabled = false;
+                });
+            }
+        }
+
+        // Haal hostname op en start met dag weergave
+        window.addEventListener('DOMContentLoaded', function() {
+            fetch('get_hostname.php')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('hostname').textContent =
+                        `Temperatuur & Luchtvochtigheid Dashboard - ${data.hostname}`;
+                })
+                .catch(error => {
+                    console.error('Error fetching hostname:', error);
+                });
+
+            // Start met dag weergave
+            loadData('dag');
+        });
+    </script>
+</body>
+</html>
