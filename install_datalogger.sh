@@ -196,7 +196,7 @@ if stel_vraag "Stap 6: Cronjobs instellen in jouw persoonlijke crontab?"; then
     echo "" >> temp_cron
     echo "1,16,31,46 * * * * ~/pythonscripts/dhtvenv/bin/python ~/pythonscripts/MatplotlibWeekTemperatuur.py" >> temp_cron
     echo "" >> temp_cron
-    echo "1,16,31,46 * * * * ~/pythonscripts/dhtvenv/bin/python ~/pythonscripts/MatplotlibMaandTemperatuur.pyy" >> temp_cron
+    echo "1,16,31,46 * * * * ~/pythonscripts/dhtvenv/bin/python ~/pythonscripts/MatplotlibMaandTemperatuur.py" >> temp_cron
     echo "" >> temp_cron
     echo "1,16,31,46 * * * * ~/pythonscripts/dhtvenv/bin/python ~/pythonscripts/MatplotlibDagVochtigheid.py" >> temp_cron
     echo "" >> temp_cron
@@ -210,11 +210,11 @@ if stel_vraag "Stap 6: Cronjobs instellen in jouw persoonlijke crontab?"; then
     echo "" >> temp_cron
     echo "2,17,32,47 * * * * sudo cp ~/MAANDtemperatuur.png /var/www/html" >> temp_cron
     echo "" >> temp_cron
-    echo "2,17,32,47 * * * * sudo cp ~/DAGtemperatuur.png /var/www/html" >> temp_cron
+    echo "2,17,32,47 * * * * sudo cp ~/DAGvochtigheid.png /var/www/html" >> temp_cron
     echo "" >> temp_cron
-    echo "2,17,32,47 * * * * sudo cp ~/WEEKtemperatuur.png /var/www/html" >> temp_cron
+    echo "2,17,32,47 * * * * sudo cp ~/WEEKvochtigheid.png /var/www/html" >> temp_cron
     echo "" >> temp_cron
-    echo "2,17,32,47 * * * * sudo cp ~/MAANDtemperatuur.png /var/www/html" >> temp_cron
+    echo "2,17,32,47 * * * * sudo cp ~/MAANDvochtigheid.png /var/www/html" >> temp_cron
     echo "" >> temp_cron
     echo "# rechten voor de website: " >> temp_cron
     echo "#2,17,32,47 * * * * sudo chown www-data:www-data /var/www/html/*.png" >> temp_cron
