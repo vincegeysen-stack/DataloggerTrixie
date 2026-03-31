@@ -1,6 +1,6 @@
 # DHT22 Datalogger & Migratie Project (Trixie)
 
-Dit project is ontworpen voor de Raspberry Pi (OS Trixie) om temperatuur en luchtvochtigheid te loggen in een MariaDB database. Het bevat een geautomatiseerd installatiescript dat ook de migratie van oude data (vanaf Bookworm) ondersteunt.
+Dit project is ontworpen voor de Raspberry Pi (OS Trixie) om temperatuur en luchtvochtigheid te loggen in een MariaDB database. Het bevat een geautomatiseerd installatiescript dat ook de migratie van oude data (vanaf Bookworm) ondersteunt. Gemaakt door Vince Geysen, veel plezier en succes!
 
 ### Mappenstructuur van dit project:
 ```text
